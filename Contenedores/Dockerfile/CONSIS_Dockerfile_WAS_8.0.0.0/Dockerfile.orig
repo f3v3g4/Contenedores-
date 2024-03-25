@@ -1,0 +1,87 @@
+# Utilizando CentOS 7 para la base de la imagen
+FROM centos:7
+
+MAINTAINER Carlos Gomez G cgomeznt@gmail.com
+
+# Declaramos las siguientes variables por recomendaciones d Docker
+ENV     container docker
+
+# Instalamos paquetes necesarios para la base que nos permitan administrar y hacer troubleshooting
+RUN     yum -y update && \
+        yum -y install sudo \
+        tar \
+        gzip \
+        openssh-clients \
+        vi \
+        find \
+	net-tools \
+	zip \
+	unzip \
+	ld-linux.so.2 \
+	libgcc.i686
+
+# Limpiamos los temporales de yum
+RUN	yum clean all
+
+
+# Creamos los directorios requeridos para copiar los archivos base, configuraciones y otras segun sea la necesidad. Tambien le otorgamos los permisos.
+RUN	mkdir -p /scm/software && \
+	mkdir -p /scm/software/im && \
+	mkdir -p /scm/software/was-8 && \
+	mkdir -p /scm/software/fix-9 && \
+	mkdir -p /scm/EAR && \
+	mkdir -p /scm/external && \
+	mkdir -p /scm/scripts && \
+	mkdir -p /scm/logs
+
+# Copiamos los archivos base y de configuracion dentro de la imagen.
+COPY    startWAS.sh \
+        stopWAS.sh \
+        copylogs.sh \
+	/scm/scripts/
+RUN	chmod -R 775 /scm/scripts
+
+COPY	agent.installer.linux.gtk.x86_1.8.8000.20171130_1105.zip \
+	WAS-8.0-InstallationPackages.zip \
+	8.0.0-WS-WAS-FP0000009-part1.zip \
+ 	8.0.0-WS-WAS-FP0000009-part2.zip \
+	/scm/software/
+
+
+# Instalamos el Installation Manager # Install WAS 8.0.0.0 Developer # Install WAS-Fix-9 Developer # Create AppServer Profile
+RUN	unzip -qd /scm/software/im /scm/software/agent.installer.linux.gtk.x86_1.8.8000.20171130_1105.zip && \
+ 	/scm/software/im/installc -acceptLicense -accessRights admin \
+	-installationDirectory "/opt/IBM/InstallationManager" \
+	-dataLocation "/var/ibm/InstallationManager" -showProgress && \
+	rm -rf /scm/software/im && \
+	unzip -qd /scm/software/was-8 /scm/software/WAS-8.0-InstallationPackages.zip && \
+	/opt/IBM/InstallationManager/eclipse/tools/imcl -showProgress \
+	-acceptLicense install com.ibm.websphere.DEVELOPERS.v80 \
+	-repositories /scm/software/was-8/repository.config \
+	-installationDirectory /opt/IBM/WebSphere/AppServer && \
+	rm -rf /scm/software/was-8 && \
+	unzip -qd /scm/software/fix-9 /scm/software/8.0.0-WS-WAS-FP0000009-part1.zip && \
+	unzip -qd /scm/software/fix-9 /scm/software/8.0.0-WS-WAS-FP0000009-part2.zip && \
+	/opt/IBM/InstallationManager/eclipse/tools/imcl -showProgress \
+	-acceptLicense install com.ibm.websphere.DEVELOPERS.v80 \
+	-repositories /scm/software/fix-9/repository.config \
+	-installationDirectory /opt/IBM/WebSphere/AppServer && \
+	rm -rf /scm/software/fix-9 && \
+	/opt/IBM/WebSphere/AppServer/bin/manageprofiles.sh -create -templatePath /opt/IBM/WebSphere/AppServer/profileTemplates/default/ -profileName D9080 -profilePath /opt/IBM/WebSphere/profiles/D9080
+
+
+# Limpiamos todos los archivo que ya no son requeridos para la imagen.
+RUN	rm -rf /scm/software && \
+	rm -rf /tmp/*
+
+# Creamos este volumen que nos permite modificar, eliminar o agregar archivos y/o directorios luego que el CONTENEDOR este en uso.
+VOLUME	"/scm"
+
+# Cuando el CONTENEDOR este operativo, el host expondra este puerto.
+# ARG	PORT=9060
+# EXPOSE	$PORT
+EXPOSE	2809 9402 9403 9353 9633 9100 11003 9401 7276 7286 5558 5578 5060 5061 8880 9060 9043 9080 9443
+
+#Lanzar WAS
+# CMD ["/scm//scripts/startWAS.sh"]
+

@@ -1,0 +1,233 @@
+############################################################################
+## Environment-specific Parameters for Celita Test                        ##
+## Created by:  Mark Puddephat - 09/27/2005                               ##
+##                                                                        ##
+## Change History:                                                        ##
+############################################################################
+## Changed by Manuel Seoane - 10/10/2005                                  ##
+## Added: idclassMX=IDDBFactoryOracle   and  idclassVE=IDDBFactoryOracle  ##
+##------------------------------------------------------------------------##
+## Changed by Lloyd Walton 10/10/2005                                     ##
+## Added:  elixirreport.xml which defines WebSphere server                ##
+##         Path for ASL import and log files                              ##
+##------------------------------------------------------------------------##
+## Changed by Mark Puddephat 10/13/2005                                   ##
+## Added:  Propery stanzas for language, country, ASL, login strategy     ##
+##         and product/template migration.                                ##
+##------------------------------------------------------------------------##
+## Changed by Manuel Seoane - 11/28/2005                                  ##
+## Added: AssurNetPage=/WController                                       ##
+##------------------------------------------------------------------------##
+## Changed by Victoria Topolinskaya - 12/07/2005                          ##
+## Added:  AssurNetCookie=SMSESSION                                       ##
+##------------------------------------------------------------------------##
+## Changed by Rima Gerhard - 12/15/2005                                   ##
+## Uncommented Laguage and Local stanza                                   ##
+##------------------------------------------------------------------------##
+## Changed by Devon Williamson 01/27/2006                                 ##
+## For Elixir, point Celita to Assurant instead of AssurantTest           ##
+############################################################################
+
+############################################################################
+##                      Multi-language Parameters                         ##
+############################################################################
+countries=VE,MX
+
+#<Lenguage and Local>
+    #<Venezuelan Spanish>
+        #idioma=es
+        #pais=VE
+    #</Venezuelan Spanish>
+   
+    #<USA English>
+        idioma=en
+        pais=US
+    #</USA English>
+#</Lenguage and Local>
+
+
+############################################################################
+## Email Configuration Parameters ##
+############################################################################
+
+
+#<Email Util>
+email.send.timeout=2000
+email.send.production.enabled=false
+email.send.address.development=acsele.development@consisint.com
+mailServer=mail.consisint.com
+mailPort=2525
+acsele.email.smtp.account.username=acsele.development@consisint.com
+acsele.email.smtp.account.password=1234567
+administratorEmail=info@consisint.com
+
+#<Email Util/>
+
+
+#<DBMS>
+
+ ############################################################################
+ ##                        Instance Parameters                             ##
+ ############################################################################
+   
+
+
+# Setting of product´s database pool connections   (CA.xml,MX.xml,etc. )
+minPoolSize=10
+maxPoolSize=50
+maxIdleTime=240
+acquireIncrement=10
+maxStatementsPerConnection=100
+
+
+# Setting of global´s pool connections   (ApplicationContext.xml) 
+guMinPoolSize=5
+guMaxPoolSize=20
+guMaxIdleTime=240
+guAcquireIncrement=5
+
+
+#DB  PERU
+         #<JDBCBO Driver>
+            driverDBPE=oracle.jdbc.driver.OracleDriver
+	    servidorDBPE=jdbc:oracle:thin:@192.168.1.53:1521:orcl12c
+            idclassPE=IDDBFactoryOracle
+     #</JDBCBO Driver>
+    
+
+	      
+#DB  Usuarios Central
+
+    #<JDBC Driver>
+        driverDB=oracle.jdbc.driver.OracleDriver
+	servidorDB=jdbc:oracle:thin:@192.168.1.53:1521:orcl12c
+        idclass=IDDBFactoryOracle
+    #</JDBC Driver>
+#<DBMS/>
+
+
+
+  
+
+############################################################################
+##         Usuario y Pasword de la Conexion a la Base de Datos            ##
+############################################################################
+
+       
+   #-- PERU --
+	userDBPE=SCM_CRECER_V138
+        passwDBPE=SCM_CRECER_V138
+
+   #DB  Usuarios Central
+        userDB=SCM_CRECERGU_V138
+        passwDB=SCM_CRECERGU_V138
+	
+   #</User and Password>
+   
+
+   
+   
+############################################################################
+##        Propiedades de la Conexion del Servidor de Aplicaciones         ##
+############################################################################
+
+      #<Connections>
+         contextfactory=com.ibm.websphere.naming.WsnInitialContextFactory
+         providerurl=iiop://localhost:2809
+      #</Connections>
+      
+
+############################################################################
+## Enable (true) or disable (false) security authentication at the object ##
+## (policy, claim, etc) level.                                            ##
+############################################################################
+
+securityEnabled=false
+charsetPage=ISO-8859-1
+############################################################################
+##             Elixir Report Server Configuration Parameters              ##
+############################################################################
+
+#<Client>
+   elixirreport.client=Assurant
+#</Client>
+
+   #<Elixir Report Server Properties>
+
+      elixirreport.Host=192.168.1.106
+      elixirreport.Port=7000
+      elixirreport.User=Administrator
+      elixirreport.Password=admin
+      elixirreport.Format=pdf
+
+      #elixirreport.dirOutput=ReportCache/onlinecache/
+      #elixirreport.url=/WController/ReportCache/onlinecache/
+      #elixirreport.xml=http://192.168.1.106:9080/WController/ReportCache/onlinecache/
+   #<Elixir Report Server Properties>
+
+############################################################################
+##            Crystal Report Server Configuration Parameters              ##
+############################################################################
+
+#<Crystal Report Server Properties>
+    crystalreport.cms=miavtapp03.mia0.assurant.com
+    crystalreport.username=cemodCelita
+    crystalreport.password=cemodCelita
+    crystalreport.authentication=secLDAP
+    crystalreport.snifferURL=http://192.168.1.106:9083/sniffrpt/MainSniff
+    crystalreport.diskDriveLetter=Y:
+    crystalreport.diskFileSeparator=/
+    crystalreport.diskReportDirectory=reports
+    crystalreport.ftpHost=Bonefish.mia0.assurant.com
+    crystalreport.ftpUsername=os0747
+    crystalreport.ftpPassword=os0747
+    crystalreport.ftpFileSeparator=/
+    crystalreport.ftpReportDirectory=reports
+    crystalreport.ftpFilePath=/international
+    crystalreport.reportTimeout=300
+    crystalreport.reportPathExtension=/reports/
+    crystalreport.reportPathBase=/u05/INTERNATIONAL/
+    crystalreport.databaseType=Oracle
+#</Crystal Report Server Properties>
+
+
+#--- ASL Multithreading property 
+ASLNumberThreads=6
+
+#--- Properties defining the directories that contain links related to entries
+entriesFileName=$company$-$initDate$-$endDate$-Entries-L.txt
+entriesRegenFileName=$company$-$initDate$-$endDate$-Regen-L.txt
+prefixForEntryfiles=C-
+
+
+############################################################################
+##                  Login Method and Number of Attempts                   ##
+############################################################################
+
+#<Login Strategy>
+    loginStrategy=Acsele
+    LoginTries=3
+    #loginStrategy=AssurNet
+#/Login Strategy>
+
+appletsClassid=clsid:CAFEEFAC-0016-0000-FFFF-ABCDEFFEDCBA
+#appletsClassid=clsid:CAFEEFAC-0015-0000-0000-ABCDEFFEDCBA
+#appletsClassid=clsid:CAFEEFAC-0014-0002-FFFF-ABCDEFFEDCBA
+
+############################################################################
+##                  Store the AssurNet Login Screen URL                   ##
+############################################################################
+
+AssurNetPage=http://kumquat.mia0.assurant.com:8080/WController/
+AssurNetCookie=SMSESSION
+
+mobile.instance=CRECER
+mobile.db.conf=PE.xml
+on.mobile.mode=false
+exploded.mode=false
+instance.for.test=false
+#{aid} = Appointment id
+mobile.aid={aid}
+#Could be Customer Username or Customer Id
+acselm.customer.identifier=empty 
+instance.for.test=LA_PREVISORA

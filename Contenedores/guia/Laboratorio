@@ -1,0 +1,163 @@
+Hacer ifconfig y ver la IP del adaptador Docker
+
+Crear un Dockerfile con solo la instalación de httpd (llamar a la imagen apache:1.0)
+hacer el build sin el--build-arg PORT=80
+en el host hacer netstat -nat | grep -i listen
+hacer el run sin -p 1234:80
+en el host hacer netstat -nat | grep -i listen
+consultar docker ps y ver la columna PORT
+iniciar el apache en el contenedor
+en el contenedor hacer un curl localhost
+consultar docker ps y ver la columna PORT
+en el contenedor netstat -nat | grep -i listen
+Evaluar resultado
+
+Crear un Docker file con solo la instalación de Httpd y colocar el EXPOSE 80 (apache:2.0)
+hacer el build sin el--build-arg PORT=80
+en el host hacer netstat -nat | grep -i listen
+hacer el run sin -p 1234:80
+en el host hacer netstat -nat | grep -i listen
+consultar docker ps y ver la columna PORT ( 80/tcp )
+iniciar el apache en el contenedor
+en el contenedor consultar el netstat
+en el contenedor hacer un curl localhost
+En el host hacer un curl localhost y ver los resultados
+hacer docker container inspect nombre_del_contenedor y ver la IP
+En el host hacer un curl 172.17.0.2 y ver los resultados
+Evaluar resultado
+
+Crear un Docker file con solo la instalación de Httpd y SIN colocar el EXPOSE 80 8080 (reutilizar apache:1.0)
+hacer el build sin el--build-arg PORT=80 (Si reutilizaste (apache:1.0) no es necesario)
+en el host hacer netstat -nat | grep -i listen
+hacer el run con -p 80:8080
+en el host hacer netstat -nat | grep -i listen
+consultar docker ps y ver la columna PORT (0.0.0.0:80->8080/tcp, :::80->8080/tcp)
+iniciar el apache en el contenedor
+en el contenedor consultar el netstat
+en el contenedor hacer un curl localhost
+En el host hacer un curl localhost y ver los resultados
+¿Porque si el host tiene el puerto 80 abierto y en el contenedor ya esta con el apache iniciado y tiene el puerto 80 iniciado, Aun sigue sin responder el curl?
+Corrige la falla 
+luego que corrijas la falla el curl debe funcionar en le host y en el contenedor. He visto que hay dos (2) formas de corregir
+
+trabajas con volumenes persistentes
+==============================
+Ver estos link oficiales:
+https://docs.docker.com/get-started/05_persisting_data/
+https://docs.docker.com/get-started/06_bind_mounts/
+
+Crear un contenedor en donde pongamos en practica los dos (2) tipos de configuración de Data Persistente.
+Verificar cual es su ROOT de la instalación de Docker (docker info)
+Verificar en el ROOT de Docker la carpeta "volumes" (ls)
+Verificar las opciones o uso de volume (docker volume --help)
+Crear un Volumen 
+Listar los volumes
+
+Crear un contenedor con data persistente del tipo Volumen.
+Crear otro contenedor con data persistente del tipo bind.
+Hacer en ambos contenedores pruebas de crear archivos y luego asegurar que se vean en el HOSt y viceversa.
+
+Hacer un troubleshooting para identificar que tipo de Volumen utiliza (Apliquen todas las técnicas)
+Recuerden (docker container inspect <Nombre_del_Contenedor>)
+
+Hacer que los volumen sean solo de R (Read)
+
+
+Docker network
+===============
+Cito textualmente información publicada de Docker.
+Recuerde que los contenedores, por defecto, se ejecutan de forma aislada y no saben nada sobre otros procesos o contenedores en la misma máquina. Entonces, ¿cómo permitimos que un contenedor hable con otro? La respuesta es la creación de redes . Ahora, no tiene que ser un ingeniero de redes (¡hurra!). Simplemente recuerda esta regla .
+*Si dos contenedores están en la misma red, pueden comunicarse entre sí. Si no lo son, no pueden.*
+
+Ver el link oficial de Docker Network:
+https://docs.docker.com/network/
+
+Hacer en el Host un "ifconfig" y cada vez que manipulen  docker network hagan un ifconfig y evalúen.
+
+Más ayuda de docker en cuanto a Network (docker network --help)
+
+Crear una network llamada app_net. (docker network create <nombre_del_network>)
+Listar todas las redes Docker. (docker network ls)
+docker network inspect app_net
+Evaluar ifconfig en el Host.
+Crear un contenedor y asignarle nuestra Network creada (docker run -dti --rm --name "apache-net1.0" --network app_net apache:1.0)
+Averiguar cual es la IP del Contenedor (docker container inspect <Nombre_del_Contenedor>)
+Hacer troubleshooting del comando ping entre el HOST y contenedor y viceversa, por IP.
+Crear otro contenedor y asignar nuestra Network creada (docker run -dti --rm --name "apache-net2.0" --network app_net apache:1.0)
+Averiguar cual es la IP de este nuevo Contenedor (docker container inspect <Nombre_del_Contenedor>)
+Hacer troubleshooting del comando ping entre el HOST y contenedor y viceversa, por IP.
+Hacer troubleshooting del comando ping entre los contenedores por IP.
+Hacer troubleshooting del comando ping entre los contenedores por Nombre (DNS). En este ejemplo los contenedores los llamamos <apache-net1.0 y apache-net2.0>.
+Crear otro contenedor SIN ASIGNAR alguna Network (docker run -dti --rm --name "apache-net3.0" apache:1.0)
+Averiguar cual es la IP de este ultimo Contenedor (docker container inspect <Nombre_del_Contenedor>)
+Hacer troubleshooting del comando ping entre los contenedores por IP.
+Hacer troubleshooting del comando ping entre los contenedores por Nombre (DNS). En este ejemplo los contenedores los llamamos <apache-net1.0, apache-net2.0 y apache-net3.0>.
+Hacer ifconfig en el Host y evaluar que visualizan.
+Evaluar los resultados.
+
+Tips: ¿Como hacer un ping desde el contenedor sin ingresar en su SHELL?
+docker exec -ti <nombre_del_contenedor> ping -c4 <DIRECCION_IP>
+ó
+docker exec -ti <nombre_del_contenedor> ping -c4 <NOMBRE_DNS>
+
+Eliminar los Contenedores. (docker rm -f <nombre_del_contenedor>)
+Eliminar el Network creado anteriormente (docker network rm <nombre_del_network>)
+
+Volver a crear los tres (3) nuevamente pero SIN asignar un Network y realizar nuevamente en el mismo orden los Troubleshooting.
+Evaluar los resultados.
+
+
+
+Monitorizar los contenedores
+============================
+docker logs <nombre_contenedor>
+docker info
+docker stats
+docker events
+docker container inspect <nombre_contenedor>
+
+journalctl -u docker.service 
+less /var/log/messages | grep docker
+/var/log/messages
+
+Docker Registry
+===================
+Link Oficial de Docker Registry, dale un ojo primero
+https://docs.docker.com/registry/#:~:text=The%20Registry%20is%20a%20stateless,under%20the%20permissive%20Apache%20license.
+
+Ejecutar (docker images)
+Hacer una busqueda de alguna imagen llamada registry (docker search registry)
+Antes de descargar la imagen de docker registry vayan al link oficial y vean lo simple de ese manual.
+Descarguen la imagen y ejecuten el contenedor con (docker run -d -p 5000:5000 --name registry registry:2)
+Descarguen una imagen de nginx.
+Vamos a crear una etiqueta para nuestra nueva imagen para que se pueda almacenar en nuestro registry.(docker image tag nginx localhost:5000/mynginx)
+Hagan un (docker images) vean como tiene dos nombres distintos pero un mismo ID
+Consultamos nuestro registry cuantas imagenes tiene (curl localhost:5000/v2/_catalog) no veremos nada, porque no hay nada.
+Vamos a subir la imagen con el TAG que creamos para nuestro registry (docker push localhost:5000/mynginx)
+Consultamos nuestro registry cuantas imagenes tiene (curl localhost:5000/v2/_catalog)
+Descargamos la imagen que esta en el registry (docker pull localhost:5000/mynginx)
+Consultamos las imagenes (docker images)
+Iniciamos un nuevo contenedor de la imagen que descargamos del registry (docker run --name some-nginx -d -p 8080:80 localhost:5000/mynginx)
+Consultamos los contenedores (docker ps)
+Mata ese contenedor (docker container stop registry && docker container rm -v registry)
+
+Descarga otras imágenes a local y luego las pasas a tu Registry.
+
+
+Docker hub
+===========
+
+Creen una cuenta personal en docker hub
+
+Docker save / load vs export / import Salvar imagen o contenedor a un tar
+======================================
+
+Docker Compose
+=============
+
+
+
+
+
+
+

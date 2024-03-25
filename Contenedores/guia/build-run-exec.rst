@@ -1,0 +1,28 @@
+Un buen build run exec para CONSIS
++++++++++++++++++++++++++++++++++++
+
+Para WebLogic 12.2.1.3.0::
+
+	docker build -t "weblogic:12.2.1.3.0" --build-arg PORT=7021 .
+
+	docker run -dti --name "CRECER-7054"  \
+	--mount type=bind,source=/scm/external,target=/scm/external \
+	--mount type=bind,source=/scm/EAR_Weblogic,target=/scm/EAR \
+	--mount type=bind,source=/home/qatest,target=/home/qatest \
+	-p 7054:7021 \
+	"weblogic:12.2.1.3.0"
+
+	docker exec -i -t CRECER-7054 /bin/bash
+
+Para WebLogic 12.1.3.0.0::
+
+	docker build -t "weblogic:12.1.3.0.0" --build-arg PORT=7021 .
+
+	docker run -dti --name "BXMAS-7050"  \
+	--mount type=bind,source=/scm/external,target=/scm/external \
+	--mount type=bind,source=/scm/EAR_Weblogic,target=/scm/EAR \
+	--mount type=bind,source=/home/qatest,target=/home/qatest \
+	-p 7050:7021 \
+	"weblogic:12.1.3.0.0"
+
+	docker exec -i -t CRECER-7054 /bin/bash
